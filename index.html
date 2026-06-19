@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Interview Assistant</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-label="AI Interview Assistant workspace">
+        <aside class="sidebar">
+          <div class="brand-block">
+            <div class="brand-mark" aria-hidden="true">AI</div>
+            <div>
+              <h1>AI Interview Assistant</h1>
+              <p>Resume-based interview practice</p>
+            </div>
+          </div>
+
+          <nav class="steps" aria-label="Interview steps">
+            <button class="step-button active" type="button" data-step-target="resume">
+              <span>1</span>
+              Resume
+            </button>
+            <button class="step-button" type="button" data-step-target="questions">
+              <span>2</span>
+              Questions
+            </button>
+            <button class="step-button" type="button" data-step-target="interview">
+              <span>3</span>
+              Interview
+            </button>
+            <button class="step-button" type="button" data-step-target="report">
+              <span>4</span>
+              Report
+            </button>
+          </nav>
+
+          <div class="metric-stack">
+            <div>
+              <strong id="skillCount">0</strong>
+              <span>skills found</span>
+            </div>
+            <div>
+              <strong id="questionCount">0</strong>
+              <span>questions ready</span>
+            </div>
+            <div>
+              <strong id="averageScore">--</strong>
+              <span>average score</span>
+            </div>
+          </div>
+        </aside>
+
+        <div class="content">
+          <header class="topbar">
+            <div>
+              <p class="eyebrow">Interview simulator</p>
+              <h2 id="pageTitle">Build a personalized interview</h2>
+            </div>
+            <div class="topbar-actions">
+              <button class="icon-button" id="resetBtn" type="button" title="Reset session" aria-label="Reset session">
+                R
+              </button>
+              <button class="primary-action" id="exportBtn" type="button" disabled>Export report</button>
+            </div>
+          </header>
+
+          <section class="panel active" id="resumePanel" data-step-panel="resume">
+            <div class="section-heading">
+              <div>
+                <h3>Resume Analysis</h3>
+                <p>Upload a text resume or paste resume content to generate a tailored practice interview.</p>
+              </div>
+              <button class="primary-action" id="analyzeBtn" type="button">Analyze resume</button>
+            </div>
+
+            <div class="resume-grid">
+              <div class="input-surface">
+                <label for="resumeFile">Resume file</label>
+                <input id="resumeFile" type="file" accept=".txt,.md,text/plain,text/markdown" />
+                <p class="hint">For PDF or DOCX resumes, copy the text and paste it below.</p>
+              </div>
+
+              <div class="input-surface">
+                <label for="targetRole">Target role</label>
+                <input id="targetRole" type="text" placeholder="Example: Frontend Developer" />
+                <label for="experienceLevel">Experience level</label>
+                <select id="experienceLevel">
+                  <option value="fresher">Fresher</option>
+                  <option value="junior">Junior</option>
+                  <option value="mid">Mid-level</option>
+                  <option value="senior">Senior</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-surface large">
+              <label for="resumeText">Resume text</label>
+              <textarea id="resumeText" rows="14" placeholder="Paste resume text here..."></textarea>
+            </div>
+
+            <div class="analysis-output" id="analysisOutput" hidden>
+              <div>
+                <h4>Detected Skills</h4>
+                <div class="chip-list" id="skillChips"></div>
+              </div>
+              <div>
+                <h4>Profile Signals</h4>
+                <div class="signal-grid" id="signalGrid"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="questionsPanel" data-step-panel="questions">
+            <div class="section-heading">
+              <div>
+                <h3>Question Set</h3>
+                <p>Review the personalized technical and HR questions before starting the interview.</p>
+              </div>
+              <button class="primary-action" id="startInterviewBtn" type="button" disabled>Start interview</button>
+            </div>
+            <div class="question-controls">
+              <label>
+                Question count
+                <input id="questionLimit" type="number" min="4" max="12" value="8" />
+              </label>
+              <button class="secondary-action" id="regenerateBtn" type="button" disabled>Regenerate</button>
+            </div>
+            <div class="question-list" id="questionList"></div>
+          </section>
+
+          <section class="panel" id="interviewPanel" data-step-panel="interview">
+            <div class="section-heading">
+              <div>
+                <h3>Interview</h3>
+                <p>Answer each question as if you are speaking to an interviewer.</p>
+              </div>
+              <div class="progress-pill" id="progressPill">0 / 0</div>
+            </div>
+
+            <div class="interview-stage">
+              <div class="question-card">
+                <div class="question-type" id="activeQuestionType">Question</div>
+                <h4 id="activeQuestionText">Analyze a resume to begin.</h4>
+              </div>
+
+              <div class="input-surface large">
+                <label for="answerText">Your answer</label>
+                <textarea id="answerText" rows="10" placeholder="Type your answer here..."></textarea>
+              </div>
+
+              <div class="feedback-strip" id="feedbackStrip" hidden></div>
+
+              <div class="interview-actions">
+                <button class="secondary-action" id="prevQuestionBtn" type="button">Previous</button>
+                <button class="primary-action" id="submitAnswerBtn" type="button">Submit answer</button>
+                <button class="secondary-action" id="nextQuestionBtn" type="button">Next</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="reportPanel" data-step-panel="report">
+            <div class="section-heading">
+              <div>
+                <h3>Performance Report</h3>
+                <p>Review readiness, strengths, and next steps based on submitted answers.</p>
+              </div>
+              <button class="primary-action" id="finishBtn" type="button">Generate report</button>
+            </div>
+
+            <div class="report-grid" id="reportGrid">
+              <div class="empty-state">
+                <h4>No report yet</h4>
+                <p>Submit at least one answer, then generate the report.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="src/engine.js"></script>
+    <script src="src/app.js"></script>
+  </body>
+</html>
